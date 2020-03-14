@@ -80,7 +80,8 @@
 		loader.setDRACOLoader(dracoLoader);
 
 		var children = []
-		var moved = true;
+		var pause_lerp = false;
+		var lerping = false;
 		var origin = null;
 		var camPos = new THREE.Vector3(0, 0, 0);
 
@@ -105,15 +106,17 @@
 		function animate() {
 			requestAnimationFrame(animate);
 			controls.update();
-			// move camera to forcus object
+			// move camera to focus object
 			if (targetPosition) {
-				camPos.lerp(new THREE.Vector3(targetPosition.x + 5, targetPosition.y + 5, targetPosition.z + 5), 0.05);
-				camera.position.copy(camPos);
-
 				camera.lookAt(targetPosition);
-				if (!moved) {
+
+				if (!pause_lerp) {
+					camPos.lerp(new THREE.Vector3(
+						targetPosition.x + (targetPosition.x > 0 ? 3 : - 3), 
+						targetPosition.y + 3, 
+						targetPosition.z + (targetPosition.z > 0 ? 3 : - 3)), 
+						0.05);
 					camera.position.copy(camPos);
-					moved = true;
 				}
 				camera.updateMatrixWorld();
 			}
@@ -136,9 +139,7 @@
 					INTERSECTED.material.color.setHex(0x123456);
 
 				}
-
 			}
-
 		}
 
 		function showAlert(message) {
@@ -168,19 +169,29 @@
 
 		}
 
-		function onMouseDown(event) {
+		function onMouseUp(event) {
 			if (INTERSECTED !== null) {
 				targetPosition = INTERSECTED.position;
 				showAlert(INTERSECTED.name + " has been selected.");
-				moved = false;
 			}
+			pause_lerp = false;
 
+		}
+
+		function onWheel() {
+			pause_lerp = true;
+		}
+
+		function onMouseDown() {
+			pause_lerp = true;
 		}
 
 		// Listen event
 		window.addEventListener('resize', onWindowResize);
 		renderer.domElement.addEventListener('mousemove', onMouseMove);
+		renderer.domElement.addEventListener('mouseup', onMouseUp);
 		renderer.domElement.addEventListener('mousedown', onMouseDown);
+		renderer.domElement.addEventListener('wheel', onWheel);
 	</script>
 
 </body>
