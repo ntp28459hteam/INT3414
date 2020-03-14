@@ -81,6 +81,8 @@
 
 		var children = []
 		var moved = true;
+		var origin = null;
+		var camPos = new THREE.Vector3(0, 0, 0);
 
 		loader.load(
 			'./gltf/week2_3.gltf',
@@ -105,9 +107,12 @@
 			controls.update();
 			// move camera to forcus object
 			if (targetPosition) {
+				camPos.lerp(new THREE.Vector3(targetPosition.x + 5, targetPosition.y + 5, targetPosition.z + 5), 0.05);
+				camera.position.copy(camPos);
+
 				camera.lookAt(targetPosition);
 				if (!moved) {
-					camera.position.set(targetPosition.x + 3, targetPosition.y + 3, targetPosition.z + 3);
+					camera.position.copy(camPos);
 					moved = true;
 				}
 				camera.updateMatrixWorld();
